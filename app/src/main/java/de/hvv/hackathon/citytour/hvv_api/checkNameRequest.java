@@ -25,7 +25,18 @@ public class checkNameRequest extends BaseRequest{
     public JSONObject getBody() {
         try {
             JSONObject body = super.getBody();
-            body.put("theName", this.point.getCombinedNameAsBody());
+            switch (point.getMode())
+            {
+            case 1:
+                body.put("theName", this.point.getCombinedNameAsBody());
+                break;
+            case 2:
+                JSONObject coord = new JSONObject();
+                coord.put("x",point.getCoordinateX());
+                coord.put("y",point.getCoordinateY());
+                body.put("coordinate",coord);
+                break;
+            }
             body.put("maxList", 5);
             body.put("tariffDetails", false);
             body.put("allowTypeSwitch", false);

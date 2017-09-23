@@ -14,6 +14,7 @@ public class SDName {
 	private double coordinateX;
 	private double coordinateY;
 	private String serviceTypes;
+	private int mode;
 	
 
 	
@@ -21,7 +22,15 @@ public class SDName {
 	{
 		this.combinedName = combinedName;
 		this.type = type.toString();
+		this.mode = 1;
+	}
 
+	public SDName(double coordinateX, double coordinateY, SDType type)
+	{
+		this.coordinateX = coordinateX;
+		this.coordinateY = coordinateY;
+		this.type = type.toString();
+		this.mode = 2;
 	}
 	public SDName()
 	{
@@ -62,7 +71,12 @@ public class SDName {
 	public String getName() {
 		return this.name;
 	}
-	
+
+	public int getMode()
+	{
+		return this.mode;
+
+	}
 	public String getCity() {
 		return this.city;
 	}
@@ -75,12 +89,20 @@ public class SDName {
 		return this.type;
 	}
 	
-	public double getCoordinateX() {
-		return this.coordinate.optDouble("x");
-	}
-	public double getCoordinateY() {
-		return this.coordinate.optDouble("y");
-	}
+//	public double getCoordinateX() {
+//		return this.coordinate.optDouble("x");
+//	}
+//	public double getCoordinateY() {
+//		return this.coordinate.optDouble("y");
+//	}
+
+
+    public double getCoordinateX() {
+        return coordinateX;
+    }
+    public double getCoordinateY() {
+        return coordinateY;
+    }
 	
 	public JSONObject getCoordinates() {
 		return this.coordinate;

@@ -31,7 +31,9 @@ public class Anfrage {
 	
 	public void senden () throws Exception
 	{
+//		String url = "https://api-hack.geofox.de/gti/public" + InitUri;
 		String url = "https://api-hack.geofox.de/gti/public" + InitUri;
+
 		URL obj = new URL(url);
 		HttpsURLConnection con = (HttpsURLConnection) obj.openConnection();
 		

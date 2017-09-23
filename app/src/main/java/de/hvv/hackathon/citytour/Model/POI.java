@@ -17,6 +17,9 @@ public class POI {
 
     public boolean bike = true;
     public boolean train = false;
+    public boolean done = false;
+
+    public int timereq = 10;
 
 
 }

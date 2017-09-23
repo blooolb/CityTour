@@ -79,7 +79,7 @@
         android:layout_marginRight="17dp" />
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/imageViewChecked"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:srcCompat="@drawable/ic_action_name_checked"

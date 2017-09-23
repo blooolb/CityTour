@@ -25,10 +25,10 @@
         <Spinner
             android:id="@+id/spinnerEntfernung"
             android:layout_width="match_parent"
-            android:layout_height="65dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="8dp"
             android:layout_weight="1.00"
-            android:spinnerMode="dropdown"
-            android:layout_marginTop="8dp"/>
+            android:spinnerMode="dropdown" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerViewPOI"

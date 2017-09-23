@@ -20,8 +20,17 @@ import de.hvv.hackathon.citytour.Model.POI;
 
 public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsViewHolder> {
 
+    OnClickListerner mainActivity;
 
     private Context context;
+    public interface OnClickListerner{
+        public void click(POI path);
+
+    }
+
+    public EventsAdapter(OnClickListerner mainActivity){
+        this.mainActivity = mainActivity;
+    }
 
     public ArrayList<POI> pois = new ArrayList<>();
 
@@ -48,7 +57,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
         holder.bikeImageView.setVisibility(viewBikeVisibility);
 
         Glide.with(context).load(poi.imageUrl).into(holder.coverImageView);
+        holder.itemView.setTag(poi);
 
+        holder.dauerTextView.setText((poi.timereq / 60) + "Minuten");
+        holder.checkedImageView.setVisibility(View.INVISIBLE);
 
     }
 
@@ -61,7 +73,11 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
 
         private final TextView titleTextView;
         private final TextView subTitleTextView;
+        private final TextView dauerTextView;
+
         private final ImageView coverImageView;
+        private final ImageView checkedImageView;
+
         private final ImageView bahnImageView;
         private final ImageView bikeImageView;
 
@@ -74,6 +90,16 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
             coverImageView = itemView.findViewById(R.id.event_image);
             bahnImageView = itemView.findViewById(R.id.imageViewBahn);
             bikeImageView = itemView.findViewById(R.id.imageViewRad);
+            dauerTextView = itemView.findViewById(R.id.textViewDauer);
+
+            checkedImageView = itemView.findViewById(R.id.imageViewChecked);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mainActivity.click((POI) view.getTag());
+                }
+            });
         }
     }
 

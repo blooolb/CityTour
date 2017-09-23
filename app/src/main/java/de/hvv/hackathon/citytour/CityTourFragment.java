@@ -3,12 +3,14 @@ package de.hvv.hackathon.citytour;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
@@ -36,14 +38,27 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import de.hvv.hackathon.citytour.Model.POI;
+import de.hvv.hackathon.citytour.Model.Path;
+import de.hvv.hackathon.citytour.hvv_api.Anfrage;
+import de.hvv.hackathon.citytour.hvv_api.IndividualProfileType;
+import de.hvv.hackathon.citytour.hvv_api.IndividualRoute;
+import de.hvv.hackathon.citytour.hvv_api.PathSegment;
+import de.hvv.hackathon.citytour.hvv_api.Paths;
+import de.hvv.hackathon.citytour.hvv_api.SDName;
+import de.hvv.hackathon.citytour.hvv_api.SDType;
+import de.hvv.hackathon.citytour.hvv_api.Signatur;
+import de.hvv.hackathon.citytour.hvv_api.SimpleServiceType;
+import de.hvv.hackathon.citytour.hvv_api.checkNameRequest;
+import de.hvv.hackathon.citytour.hvv_api.getIndividualRouteRequest;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CityTourFragment extends Fragment implements AdapterView.OnItemSelectedListener, LocationListener {
+public class CityTourFragment extends Fragment implements AdapterView.OnItemSelectedListener, LocationListener, EventsAdapter.OnClickListerner {
 
 
     private View baseView;
@@ -85,7 +100,7 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
                 = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
 
-        eventsAdapter = new EventsAdapter();
+        eventsAdapter = new EventsAdapter(this);
         eventsAdapter.swapList(pois);
         recyclerView.setAdapter(eventsAdapter);
 
@@ -208,12 +223,12 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
 
         currentLocation = location;
         ArrayList<String> placesArray = getArrayOfPlaces();
-        if(placesArray == null || placesArray.isEmpty())
+        if (placesArray == null || placesArray.isEmpty())
             return;
 //        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyA_0vz7p9DYlnGEY_TxE1J9Qa9yfm0-XbA&location="+ location.getLongitude()+"," +location.getLatitude() + "&radius=" +radius+ "&type=" + eventtype;
 
-        for(String type: placesArray){
-            String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyA_0vz7p9DYlnGEY_TxE1J9Qa9yfm0-XbA&location=" + location.getLatitude()+"," +location.getLongitude() + "&radius=" +radius+ "&type=" + type;
+        for (String type : placesArray) {
+            String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyA_0vz7p9DYlnGEY_TxE1J9Qa9yfm0-XbA&location=" + location.getLatitude() + "," + location.getLongitude() + "&radius=" + radius + "&type=" + type;
             JsonObjectRequest jsObjRequest = new JsonObjectRequest
                     (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 
@@ -229,7 +244,7 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
                                     Toast.makeText(getContext(), "Keine Einträge, Radius erhöhen", Toast.LENGTH_SHORT).show();
                                 }
 
-                                for(int i = 0; i < jsonArray.length();i++){
+                                for (int i = 0; i < jsonArray.length(); i++) {
                                     JSONObject obj = jsonArray.getJSONObject(i);
 
                                     JSONObject location = obj.getJSONObject("geometry").getJSONObject("location");
@@ -239,9 +254,9 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
                                     poiTemp.lon = location.getDouble("lng");
 
 
-                                    if(obj.has("photos")){
+                                    if (obj.has("photos")) {
                                         String photo = obj.getJSONArray("photos").getJSONObject(0).getString("photo_reference");
-                                        poiTemp.imageUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photo  + "&key="+apiKey;
+                                        poiTemp.imageUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photo + "&key=" + apiKey;
                                     }
 
                                     poiTemp.tag = "#" + obj.getJSONArray("types").getString(0);
@@ -252,7 +267,10 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
 
                                 }
 
+
                                 eventsAdapter.swapList(pois);
+
+//                                new AsyncTaskGeofox().execute(pois);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -340,52 +358,152 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
                 && !preferenceFun
                 && !preferenceSauf
                 && !preferenceRaub
-                && !preferenceSehen){
+                && !preferenceSehen) {
             Toast.makeText(getContext(), "Du solltest was wählen", Toast.LENGTH_SHORT).show();
             return placesCategoriesArray;
         }
 
 
-            if (preferenceSport){
-                placesCategoriesArray.add("stadium");
-            } if(preferenceEssen){
-                placesCategoriesArray.add("bar");
-                placesCategoriesArray.add("cafe");
-                placesCategoriesArray.add("restaurant");
+        if (preferenceSport) {
+            placesCategoriesArray.add("stadium");
+        }
+        if (preferenceEssen) {
+            placesCategoriesArray.add("bar");
+            placesCategoriesArray.add("cafe");
+            placesCategoriesArray.add("restaurant");
 
-            }if(preferenceNatur){
-                placesCategoriesArray.add("park");
-            }if(preferenceMuseen){
-                placesCategoriesArray.add("aquarium");
-                placesCategoriesArray.add("art_gallery");
-                placesCategoriesArray.add("museum");
-                placesCategoriesArray.add("zoo");
+        }
+        if (preferenceNatur) {
+            placesCategoriesArray.add("park");
+        }
+        if (preferenceMuseen) {
+            placesCategoriesArray.add("aquarium");
+            placesCategoriesArray.add("art_gallery");
+            placesCategoriesArray.add("museum");
+            placesCategoriesArray.add("zoo");
 
-            }if(preferenceFun){
-                placesCategoriesArray.add("amusement_park");
-                placesCategoriesArray.add("casino");
-                placesCategoriesArray.add("movie_theater");
-                placesCategoriesArray.add("night_club");
-            }if(preferenceSauf){
-                placesCategoriesArray.add("bar");
-                placesCategoriesArray.add("night_club");
-            }if(preferenceRaub){
-                placesCategoriesArray.add("casino");
-                placesCategoriesArray.add("jewelry_store");
-                placesCategoriesArray.add("liquor_store");
-            }if(preferenceSehen){
-                placesCategoriesArray.add("cemetery");
-                placesCategoriesArray.add("church");
-                placesCategoriesArray.add("city_hall");
-                placesCategoriesArray.add("hindu_temple");
-                placesCategoriesArray.add("library");
-                placesCategoriesArray.add("mosque");
-                placesCategoriesArray.add("synagogue");
-                placesCategoriesArray.add("university");
-                placesCategoriesArray.add("zoo");
+        }
+        if (preferenceFun) {
+            placesCategoriesArray.add("amusement_park");
+            placesCategoriesArray.add("casino");
+            placesCategoriesArray.add("movie_theater");
+            placesCategoriesArray.add("night_club");
+        }
+        if (preferenceSauf) {
+            placesCategoriesArray.add("bar");
+            placesCategoriesArray.add("night_club");
+        }
+        if (preferenceRaub) {
+            placesCategoriesArray.add("casino");
+            placesCategoriesArray.add("jewelry_store");
+            placesCategoriesArray.add("liquor_store");
+        }
+        if (preferenceSehen) {
+            placesCategoriesArray.add("cemetery");
+            placesCategoriesArray.add("church");
+            placesCategoriesArray.add("city_hall");
+            placesCategoriesArray.add("hindu_temple");
+            placesCategoriesArray.add("library");
+            placesCategoriesArray.add("mosque");
+            placesCategoriesArray.add("synagogue");
+            placesCategoriesArray.add("university");
+            placesCategoriesArray.add("zoo");
+
+        }
+        return placesCategoriesArray;
+    }
+
+
+    Signatur nutzer = new Signatur("mobi-hack", "H4m$urgH13okt");
+
+    @Override
+    public void click(POI path) {
+        Intent intent = new Intent(getContext(),DetailActivity.class);
+        double[] doubles = new double[4];
+        doubles[0] = currentLocation.getLatitude();
+        doubles[1] = currentLocation.getLongitude();
+
+        doubles[2] = path.lat;
+        doubles[3] = path.lon;
+
+        intent.putExtra("Points",doubles);
+
+        startActivity(intent);
+    }
+
+    class AsyncTaskGeofox extends AsyncTask<ArrayList<POI>, Integer, ArrayList<POI>> {
+
+
+        @Override
+        protected ArrayList<POI> doInBackground(ArrayList<POI>... arrayLists) {
+            SDName startDestination = new SDName(currentLocation.getLatitude(), currentLocation.getLongitude(), SDType.UNKNOWN);
+            checkNameRequest checkNameRequestStart = new checkNameRequest(startDestination, "HHV_LISTED", Locale.getDefault(), 30);
+            Anfrage anfrage = new Anfrage(nutzer, checkNameRequestStart.getBody(), checkNameRequestStart.getRequestUri());
+
+            try {
+                anfrage.senden();
+                startDestination.completWithCheckNameResponse(anfrage.getResponseBody(), 0);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            ArrayList<POI> poisList = arrayLists[0];
+            for (POI poi : poisList) {
+                SDName endDestination = new SDName(poi.lat, poi.lon, SDType.UNKNOWN);
+                checkNameRequest checkNameRequestEnd = new checkNameRequest(endDestination, "HHV_LISTED", Locale.getDefault(), 30);
+                Anfrage anfrageEnd = new Anfrage(nutzer, checkNameRequestEnd.getBody(), checkNameRequestEnd.getRequestUri());
+
+                try {
+                    anfrageEnd.senden();
+                    endDestination.completWithCheckNameResponse(anfrageEnd.getResponseBody(), 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                getIndividualRouteRequest getIndividualRouteRequest = new getIndividualRouteRequest(startDestination, SimpleServiceType.BICYCLE, IndividualProfileType.BICYCLE_NORMAL, endDestination, 500, 5, "HVV_LISTED", Locale.getDefault(), 30);
+
+                Anfrage anfrageIndividualRoute = new Anfrage(nutzer, getIndividualRouteRequest.getBody(), getIndividualRouteRequest.getRequestUri());
+
+
+                try {
+                    anfrageIndividualRoute.senden();
+
+
+                    IndividualRoute dieRoute = new IndividualRoute();
+                    dieRoute.ValuesFromJSON(anfrageIndividualRoute.getResponseBody());
+                    int time = dieRoute.getTime();
+                    poi.timereq = time;
+
+                    Paths pfad = new Paths();
+
+                    pfad.ValuesFromJSON(dieRoute.getPath());
+
+
+//                pfad.getSegmentByIndex(5).getAttribute() //wegbeschaffenheit
+
+                    ArrayList<Path> pathArrayList = new ArrayList<>();
+                    for(int i = 0; i < pfad.size(); i++){
+                       PathSegment pathSegment=  pfad.getSegmentByIndex(i);
+
+                        for(int pathIndex = 0; pathIndex < pathSegment.size(); pathIndex++){
+                            Path path = new Path();
+                            path.lat = pathSegment.getCoordinateByIndex(pathIndex).getCoordinateX();
+                            path.lng = pathSegment.getCoordinateByIndex(pathIndex).getCoordinateY();
+                            pathArrayList.add(path);
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
-        return placesCategoriesArray;
+
+            return poisList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<POI> pois) {
+            eventsAdapter.swapList(pois);
+        }
     }
 
 }

@@ -26,12 +26,13 @@
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".MainActivityBottomNavigation"
-            android:label="@string/title_activity_main_bottom_navigation"></activity>
-
+            android:label="@string/title_activity_main_bottom_navigation" />
 
         <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
         <uses-feature android:name="android.hardware.location.gps" />
 
+        <activity android:name=".DetailActivity"></activity>
     </application>
 
 </manifest>
