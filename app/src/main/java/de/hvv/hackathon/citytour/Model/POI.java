@@ -7,10 +7,16 @@ package de.hvv.hackathon.citytour.Model;
 public class POI {
 
 
+    public String tag = "";
     public String title = "";
 
-    public String tag = "";
+    public double lat = 0;
+    public double lon = 0;
+
     public String imageUrl = "";
+
+    public boolean bike = true;
+    public boolean train = false;
 
 
 }

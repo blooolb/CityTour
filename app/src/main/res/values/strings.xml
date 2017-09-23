@@ -41,11 +41,13 @@
     </string-array>
     <string-array name="entfernung_array">
         <item>0 Kilometer</item>
+        <item>1 Kilometer</item>
+        <item>2 Kilometer</item>
+        <item>4 Kilometer</item>
         <item>5 Kilometer</item>
         <item>10 Kilometer</item>
         <item>15 Kilometer</item>
         <item>25 Kilometer</item>
-        <item>50 Kilometer</item>
     </string-array>
 
     <string-array name="list_preference_entries">

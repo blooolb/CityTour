@@ -24,23 +24,39 @@
 
     <SwitchPreference
         android:defaultValue="true"
-        android:key="museum_switch"
+        android:key="museen_switch"
         android:summary=""
-        android:title="Museum" />
+        android:title="Museen" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="fun_switch"
+        android:summary=""
+        android:title="Spaß" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="kunst_switch"
+        android:summary=""
+        android:title="Kunst" />
 
 
     <SwitchPreference
         android:defaultValue="true"
-        android:key="musik_switch"
+        android:key="sauftour_switch"
         android:summary=""
-        android:title="Musik" />
-
+        android:title="Sauftour" />
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="raubzug_switch"
+        android:summary=""
+        android:title="Raubzug" />
 
     <SwitchPreference
         android:defaultValue="true"
-        android:key="unterhaltung_switch"
+        android:key="sehensw_switch"
         android:summary=""
-        android:title="Unterhaltung" />
+        android:title="Sehenswürdigkeiten" />
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code.

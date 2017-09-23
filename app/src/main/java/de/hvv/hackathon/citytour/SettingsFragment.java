@@ -27,6 +27,8 @@ public class SettingsFragment extends PreferenceFragment {
             editor.putBoolean("edited", true);
             editor.apply();
         }
+
+
     }
 
     @Override

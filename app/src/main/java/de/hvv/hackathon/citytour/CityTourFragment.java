@@ -3,14 +3,17 @@ package de.hvv.hackathon.citytour;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -20,6 +23,21 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import de.hvv.hackathon.citytour.Model.POI;
 
 
 /**
@@ -34,6 +52,13 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
     private EventsAdapter eventsAdapter;
     private LocationManager locationManager;
     private Location currentLocation;
+    private RequestQueue requestQueue;
+
+    public String apiKey = "AIzaSyA_0vz7p9DYlnGEY_TxE1J9Qa9yfm0-XbA";
+
+
+    private ArrayList<POI> pois = new ArrayList<>();
+    private int radius = 500;
 
     public CityTourFragment() {
         // Required empty public constructor
@@ -61,6 +86,7 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
         recyclerView.setLayoutManager(layoutManager);
 
         eventsAdapter = new EventsAdapter();
+        eventsAdapter.swapList(pois);
         recyclerView.setAdapter(eventsAdapter);
 
 
@@ -74,24 +100,25 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_FINE);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
-        String provider = locationManager.getBestProvider(criteria, true);
-        if (provider != null) {
-            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                Toast.makeText(getContext(), "You need Permission granted", Toast.LENGTH_SHORT).show();
-            } else
-                locationManager.requestLocationUpdates(provider, 2 * 60 * 1000, 10, this);
-        }
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(getContext(), "You need Permission granted", Toast.LENGTH_SHORT).show();
+        } else
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 60, 10, this);
+
+        checkLocationPermission();
+
+
+//        locationManager.requestSingleUpdate();
+
+        requestQueue = Volley.newRequestQueue(getContext());
+
 
         return baseView;
     }
@@ -107,27 +134,35 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
                 break;
             case "5 Kilometer":
                 Toast.makeText(getContext(), "5", Toast.LENGTH_SHORT).show();
-                reloadWithValues(5);
+                reloadWithValues(5000);
                 break;
             case "10 Kilometer":
                 Toast.makeText(getContext(), "10", Toast.LENGTH_SHORT).show();
-                reloadWithValues(10);
+                reloadWithValues(10000);
 
                 break;
             case "15 Kilometer":
                 Toast.makeText(getContext(), "15", Toast.LENGTH_SHORT).show();
-                reloadWithValues(15);
+                reloadWithValues(15000);
 
                 break;
             case "25 Kilometer":
                 Toast.makeText(getContext(), "25", Toast.LENGTH_SHORT).show();
-                reloadWithValues(25);
+                reloadWithValues(25000);
 
                 break;
-            case "50 Kilometer":
-                Toast.makeText(getContext(), "50", Toast.LENGTH_SHORT).show();
-                reloadWithValues(50);
+            case "2 Kilometer":
+                Toast.makeText(getContext(), "2", Toast.LENGTH_SHORT).show();
+                reloadWithValues(2000);
 
+                break;
+            case "1 Kilometer":
+                Toast.makeText(getContext(), "1", Toast.LENGTH_SHORT).show();
+                reloadWithValues(1000);
+                break;
+            case "4 Kilometer":
+                Toast.makeText(getContext(), "4", Toast.LENGTH_SHORT).show();
+                reloadWithValues(4000);
                 break;
             default:
                 Toast.makeText(getContext(), "Soweit kann man doch nicht aus Hamburg raus wollen", Toast.LENGTH_SHORT).show();
@@ -143,6 +178,23 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
 
     public void reloadWithValues(int meter) {
         //TODO
+        radius = meter;
+
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(getContext(), "You need Permission granted", Toast.LENGTH_SHORT).show();
+        } else
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 60, 10, this);
+
+        checkLocationPermission();
     }
 
 
@@ -153,7 +205,74 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
 
     @Override
     public void onLocationChanged(Location location) {
+
         currentLocation = location;
+        ArrayList<String> placesArray = getArrayOfPlaces();
+        if(placesArray == null || placesArray.isEmpty())
+            return;
+//        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyA_0vz7p9DYlnGEY_TxE1J9Qa9yfm0-XbA&location="+ location.getLongitude()+"," +location.getLatitude() + "&radius=" +radius+ "&type=" + eventtype;
+
+        for(String type: placesArray){
+            String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=AIzaSyA_0vz7p9DYlnGEY_TxE1J9Qa9yfm0-XbA&location=" + location.getLatitude()+"," +location.getLongitude() + "&radius=" +radius+ "&type=" + type;
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            System.out.println(response.toString());
+
+
+                            try {
+                                JSONArray jsonArray = response.getJSONArray("results");
+
+                                if (jsonArray.length() == 0) {
+                                    Toast.makeText(getContext(), "Keine Einträge, Radius erhöhen", Toast.LENGTH_SHORT).show();
+                                }
+
+                                for(int i = 0; i < jsonArray.length();i++){
+                                    JSONObject obj = jsonArray.getJSONObject(i);
+
+                                    JSONObject location = obj.getJSONObject("geometry").getJSONObject("location");
+
+                                    POI poiTemp = new POI();
+                                    poiTemp.lat = location.getDouble("lat");
+                                    poiTemp.lon = location.getDouble("lng");
+
+
+                                    if(obj.has("photos")){
+                                        String photo = obj.getJSONArray("photos").getJSONObject(0).getString("photo_reference");
+                                        poiTemp.imageUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photo  + "&key="+apiKey;
+                                    }
+
+                                    poiTemp.tag = "#" + obj.getJSONArray("types").getString(0);
+
+                                    poiTemp.title = obj.getString("name");
+
+                                    pois.add(poiTemp);
+
+                                }
+
+                                eventsAdapter.swapList(pois);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            System.out.println(error.toString());
+
+                        }
+                    });
+
+            requestQueue.add(jsObjRequest);
+
+        }
+
+
     }
 
     @Override
@@ -170,4 +289,103 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
     public void onProviderDisabled(String s) {
 
     }
+
+
+    public static final int MY_PERMISSIONS_REQUEST_LOCATION = 99;
+
+    public boolean checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+            }
+
+
+        } else {
+            // No explanation needed, we can request the permission.
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_LOCATION);
+        }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2 * 60 * 1000, 10, this);
+
+        return false;
+    }
+
+
+    public ArrayList<String> getArrayOfPlaces() {
+        ArrayList<String> placesCategoriesArray = new ArrayList<>();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        boolean preferenceSport = preferences.getBoolean("sport_switch", false);
+        boolean preferenceEssen = preferences.getBoolean("essen_switch", false);
+        boolean preferenceNatur = preferences.getBoolean("natur_switch", false);
+        boolean preferenceMuseen = preferences.getBoolean("museen_switch", false);
+        boolean preferenceFun = preferences.getBoolean("fun_switch", false);
+        boolean preferenceSauf = preferences.getBoolean("sauftour_switch", false);
+        boolean preferenceRaub = preferences.getBoolean("raubzug_switch", false);
+        boolean preferenceSehen = preferences.getBoolean("sehensw_switch", false);
+
+        if (!preferenceSport && !preferenceEssen && !preferenceNatur
+                && !preferenceMuseen
+                && !preferenceFun
+                && !preferenceSauf
+                && !preferenceRaub
+                && !preferenceSehen){
+            Toast.makeText(getContext(), "Du solltest was wählen", Toast.LENGTH_SHORT).show();
+            return placesCategoriesArray;
+        }
+
+
+            if (preferenceSport){
+                placesCategoriesArray.add("stadium");
+            } if(preferenceEssen){
+                placesCategoriesArray.add("bar");
+                placesCategoriesArray.add("cafe");
+                placesCategoriesArray.add("restaurant");
+
+            }if(preferenceNatur){
+                placesCategoriesArray.add("park");
+            }if(preferenceMuseen){
+                placesCategoriesArray.add("aquarium");
+                placesCategoriesArray.add("art_gallery");
+                placesCategoriesArray.add("museum");
+                placesCategoriesArray.add("zoo");
+
+            }if(preferenceFun){
+                placesCategoriesArray.add("amusement_park");
+                placesCategoriesArray.add("casino");
+                placesCategoriesArray.add("movie_theater");
+                placesCategoriesArray.add("night_club");
+            }if(preferenceSauf){
+                placesCategoriesArray.add("bar");
+                placesCategoriesArray.add("night_club");
+            }if(preferenceRaub){
+                placesCategoriesArray.add("casino");
+                placesCategoriesArray.add("jewelry_store");
+                placesCategoriesArray.add("liquor_store");
+            }if(preferenceSehen){
+                placesCategoriesArray.add("cemetery");
+                placesCategoriesArray.add("church");
+                placesCategoriesArray.add("city_hall");
+                placesCategoriesArray.add("hindu_temple");
+                placesCategoriesArray.add("library");
+                placesCategoriesArray.add("mosque");
+                placesCategoriesArray.add("synagogue");
+                placesCategoriesArray.add("university");
+                placesCategoriesArray.add("zoo");
+
+            }
+        return placesCategoriesArray;
+    }
+
 }

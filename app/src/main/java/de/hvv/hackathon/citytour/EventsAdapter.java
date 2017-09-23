@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 import de.hvv.hackathon.citytour.Model.POI;
@@ -34,6 +36,20 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
     @Override
     public void onBindViewHolder(EventsViewHolder holder, int position) {
 
+        POI poi = pois.get(position);
+
+        holder.titleTextView.setText(poi.title);
+        holder.subTitleTextView.setText(poi.tag);
+
+        int viewTrainVisibility = poi.train ? View.VISIBLE : View.INVISIBLE;
+        int viewBikeVisibility = poi.bike ? View.VISIBLE : View.INVISIBLE;
+
+        holder.bahnImageView.setVisibility(viewTrainVisibility);
+        holder.bikeImageView.setVisibility(viewBikeVisibility);
+
+        Glide.with(context).load(poi.imageUrl).into(holder.coverImageView);
+
+
     }
 
     @Override
@@ -53,7 +69,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
         public EventsViewHolder(View itemView) {
             super(itemView);
 
-            titleTextView = itemView.findViewById(R.id.event_subtitle_textview);
+            titleTextView = itemView.findViewById(R.id.event_title_name_textview);
             subTitleTextView = itemView.findViewById(R.id.event_subtitle_textview);
             coverImageView = itemView.findViewById(R.id.event_image);
             bahnImageView = itemView.findViewById(R.id.imageViewBahn);
@@ -64,5 +80,6 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.EventsView
     public void swapList( ArrayList<POI> newList){
         pois.clear();
         pois.addAll(newList);
+        notifyDataSetChanged();
     }
 }

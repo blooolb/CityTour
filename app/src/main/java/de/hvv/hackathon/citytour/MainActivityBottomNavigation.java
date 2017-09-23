@@ -47,6 +47,14 @@ public class MainActivityBottomNavigation extends AppCompatActivity {
         contentFrame = findViewById(R.id.content);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+
+
+        CityTourFragment cityTourFragment = new CityTourFragment();
+        fragmentTransaction.replace(R.id.content,cityTourFragment);
+        fragmentTransaction.commit();
     }
 
 }
