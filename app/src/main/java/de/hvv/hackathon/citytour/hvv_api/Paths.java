@@ -31,7 +31,7 @@ public class Paths extends ArrayList<PathSegment>{
 		for(int i=0;i<length;i++)
 		{
 			PathSegment Seg = new PathSegment();
-			Seg.ValuesFromJSON(array.getJSONObject(i));
+			Seg.ValuesFromJSON(array.optJSONObject(i));
 			this.add(Seg);
 		}
 	}
