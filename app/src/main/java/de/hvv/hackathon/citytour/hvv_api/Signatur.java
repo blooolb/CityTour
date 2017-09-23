@@ -36,6 +36,7 @@ public class Signatur {
             Mac mac = Mac.getInstance(algorithm);
             mac.init(keySpec);
             byte[] signature = mac.doFinal(data.toString().getBytes());
+            System.out.println(Base64.encodeToString(signature,Base64.NO_WRAP));
             return Base64.encodeToString(signature,Base64.NO_WRAP);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);

@@ -144,43 +144,35 @@ public class CityTourFragment extends Fragment implements AdapterView.OnItemSele
         String selectedItem = (String) adapterView.getSelectedItem();
         switch (selectedItem) {
             case "0 Kilometer":
-                Toast.makeText(getContext(), "0", Toast.LENGTH_SHORT).show();
                 reloadWithValues(0);
                 break;
             case "5 Kilometer":
-                Toast.makeText(getContext(), "5", Toast.LENGTH_SHORT).show();
                 reloadWithValues(5000);
                 break;
             case "10 Kilometer":
-                Toast.makeText(getContext(), "10", Toast.LENGTH_SHORT).show();
                 reloadWithValues(10000);
 
                 break;
             case "15 Kilometer":
-                Toast.makeText(getContext(), "15", Toast.LENGTH_SHORT).show();
                 reloadWithValues(15000);
 
                 break;
             case "25 Kilometer":
-                Toast.makeText(getContext(), "25", Toast.LENGTH_SHORT).show();
                 reloadWithValues(25000);
 
                 break;
             case "2 Kilometer":
-                Toast.makeText(getContext(), "2", Toast.LENGTH_SHORT).show();
                 reloadWithValues(2000);
 
                 break;
             case "1 Kilometer":
-                Toast.makeText(getContext(), "1", Toast.LENGTH_SHORT).show();
                 reloadWithValues(1000);
                 break;
             case "4 Kilometer":
-                Toast.makeText(getContext(), "4", Toast.LENGTH_SHORT).show();
                 reloadWithValues(4000);
                 break;
             default:
-                Toast.makeText(getContext(), "Soweit kann man doch nicht aus Hamburg raus wollen", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "Soweit kann man doch nicht aus Hamburg raus wollen", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

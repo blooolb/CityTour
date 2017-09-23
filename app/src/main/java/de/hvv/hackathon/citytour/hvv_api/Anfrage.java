@@ -40,10 +40,11 @@ public class Anfrage {
 		try {
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Accept", "application/json");
-			con.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+			con.setRequestProperty("Content-Type", "application/json");
 			con.setRequestProperty("geofox-auth-type", "HmacSHA1");
 			con.setRequestProperty("geofox-auth-user", Nutzer.authUser);
-			con.setRequestProperty("geofox-auth-signature", Nutzer.generateSignature(body/*new JSONObject()*/));
+			con.setRequestProperty("geofox-auth-signature", Nutzer.generateSignature(body));/*new JSONObject()*/
+			con.setInstanceFollowRedirects(false);
 			con.setDoOutput(true);
 			DataOutputStream wr = new DataOutputStream(con.getOutputStream());
 			wr.writeBytes(StrBody);

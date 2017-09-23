@@ -12,6 +12,7 @@ import de.hvv.hackathon.citytour.Model.Path;
 import de.hvv.hackathon.citytour.hvv_api.Anfrage;
 import de.hvv.hackathon.citytour.hvv_api.IndividualProfileType;
 import de.hvv.hackathon.citytour.hvv_api.IndividualRoute;
+import de.hvv.hackathon.citytour.hvv_api.InitRequest;
 import de.hvv.hackathon.citytour.hvv_api.PathSegment;
 import de.hvv.hackathon.citytour.hvv_api.Paths;
 import de.hvv.hackathon.citytour.hvv_api.SDName;
@@ -48,12 +49,25 @@ public class DetailActivity extends AppCompatActivity {
         protected ArrayList<POI> doInBackground(POI... arrayLists) {
 
 
+            InitRequest initRequest = new InitRequest();
+
+            Anfrage initAnfrage = new Anfrage(nutzer, initRequest.getBody(),initRequest.getRequestUri());
+
+            try {
+                initAnfrage.senden();
+                System.out.println(initAnfrage.getResponseBody().toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
             SDName startDestination = new SDName(doubleArray[0], doubleArray[1], SDType.UNKNOWN);
-            checkNameRequest checkNameRequestStart = new checkNameRequest(startDestination, "HHV_LISTED", Locale.getDefault(), 30);
+            checkNameRequest checkNameRequestStart = new checkNameRequest(startDestination, "HVV_LISTED", Locale.getDefault(), 30);
             Anfrage anfrage = new Anfrage(nutzer, checkNameRequestStart.getBody(), checkNameRequestStart.getRequestUri());
 
             try {
                 anfrage.senden();
+                System.out.println("RESPONSE" + anfrage.getResponseCode());
                 startDestination.completWithCheckNameResponse(anfrage.getResponseBody(), 0);
             } catch (Exception e) {
                 e.printStackTrace();
