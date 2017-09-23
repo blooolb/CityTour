@@ -1,8 +1,7 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class IndividualRoute{
@@ -48,7 +47,7 @@ public class IndividualRoute{
 		return this.path;
 	}
 	
-	public void ValuesFromJSON(JSONObject raw)
+	public void ValuesFromJSON(JSONObject raw) throws JSONException
 	{
 		JSONArray array = raw.getJSONArray("routes");
 		JSONObject route = array.getJSONObject(0);

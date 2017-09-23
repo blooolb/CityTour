@@ -1,12 +1,13 @@
 // From http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.nio.charset.Charset;
+import android.util.Base64;
 
+import org.json.JSONObject;
+
+import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -35,7 +36,7 @@ public class Signatur {
             Mac mac = Mac.getInstance(algorithm);
             mac.init(keySpec);
             byte[] signature = mac.doFinal(data.toString().getBytes());
-            return new String(Base64.encodeBase64(signature));
+            return Base64.encodeToString(signature,Base64.NO_WRAP);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (InvalidKeyException e) {

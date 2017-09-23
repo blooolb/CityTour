@@ -1,6 +1,5 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class InitRequest {
@@ -16,12 +15,8 @@ public class InitRequest {
 	}
 
 	public JSONObject getBody() {
-        try {
             JSONObject body = new JSONObject();
             return body;
-        } catch (JSONException e) {
-            return null;
-        }
     }
 
 }

@@ -1,9 +1,10 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 public class PathSegment extends ArrayList<Coordinate>{
 	
@@ -30,7 +31,7 @@ public class PathSegment extends ArrayList<Coordinate>{
 		return this.attributte;
 	}
 	
-	public void ValuesFromJSON(JSONObject raw)
+	public void ValuesFromJSON(JSONObject raw) throws JSONException
 	{
 		
 		attributte = raw.getJSONArray("attributes").getString(0);

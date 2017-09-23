@@ -1,12 +1,8 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.util.Locale;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import hvv_api.SDType;
 
 public class GTITime {
 	

@@ -1,15 +1,10 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.util.Locale;
-
-import javax.swing.JOptionPane;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import hvv_api.BaseRequest;
-import hvv_api.SDName;
+import java.util.Locale;
 
 
 public class getIndividualRouteRequest extends BaseRequest{

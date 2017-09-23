@@ -1,12 +1,7 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.util.Locale;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import hvv_api.SDType;
 
 public class SDName {
 	
@@ -33,7 +28,7 @@ public class SDName {
 		
 	}
 	
-	public void completWithCheckNameResponse (JSONObject ResponsBody, int index)
+	public void completWithCheckNameResponse (JSONObject ResponsBody, int index) throws JSONException
 	{
 		JSONObject StationObject = new JSONObject ();
 		if (ResponsBody.getString("returnCode").equals("OK")) {

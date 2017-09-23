@@ -36,7 +36,7 @@ public class LineService {
 		return this.longInfo;
 	}
 	
-	public void ValuesFromJSON(JSONObject raw)
+	public void ValuesFromJSON(JSONObject raw) throws Exception
 	{
 		name = raw.optString("name");
 		direction = raw.optString("direction");

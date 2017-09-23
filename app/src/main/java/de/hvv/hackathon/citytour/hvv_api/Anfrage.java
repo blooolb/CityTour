@@ -1,5 +1,8 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -7,11 +10,7 @@ import java.io.InputStreamReader;
 import java.net.ProtocolException;
 import java.net.URL;
 
-import hvv_api.Signatur;
-
 import javax.net.ssl.HttpsURLConnection;
-
-import org.json.JSONObject;
 
 public class Anfrage {
 	
@@ -77,7 +76,7 @@ public class Anfrage {
 		return responseCode;
 	}
 	
-	public JSONObject getResponseBody()
+	public JSONObject getResponseBody()throws JSONException
 	{
 		return new JSONObject(responseBody);
 	}

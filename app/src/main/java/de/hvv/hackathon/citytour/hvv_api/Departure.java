@@ -1,7 +1,6 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.util.ArrayList;
-
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Departure{
@@ -80,7 +79,7 @@ public class Departure{
 		return this.childStation;
 	}
 	
-	public void ValuesFromJSON(JSONObject raw, GTITime Zeit)
+	public void ValuesFromJSON(JSONObject raw, GTITime Zeit) throws JSONException
 	{
 		referenzZeit = Zeit;
 		line = new LineService();
