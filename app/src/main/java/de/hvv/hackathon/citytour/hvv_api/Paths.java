@@ -1,9 +1,9 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
-import org.json.JSONObject;
+import org.json.JSONException;
+
+import java.util.ArrayList;
 
 public class Paths extends ArrayList<PathSegment>{
 	
@@ -24,7 +24,7 @@ public class Paths extends ArrayList<PathSegment>{
 		return (PathSegment) this.get(id);
 	}
 	
-	public void ValuesFromJSON(JSONArray array)
+	public void ValuesFromJSON(JSONArray array) throws JSONException
 	{
 		length = array.length();
 		

@@ -1,6 +1,5 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Departure{
@@ -79,7 +78,7 @@ public class Departure{
 		return this.childStation;
 	}
 	
-	public void ValuesFromJSON(JSONObject raw, GTITime Zeit) throws JSONException
+	public void ValuesFromJSON(JSONObject raw, GTITime Zeit) throws Exception
 	{
 		referenzZeit = Zeit;
 		line = new LineService();

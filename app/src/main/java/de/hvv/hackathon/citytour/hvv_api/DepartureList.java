@@ -1,7 +1,6 @@
 package de.hvv.hackathon.citytour.hvv_api;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -27,7 +26,7 @@ public class DepartureList extends ArrayList{
 		return (Departure) this.get(id);
 	}
 	
-	public void ValuesFromJSON(JSONObject raw) throws JSONException
+	public void ValuesFromJSON(JSONObject raw) throws Exception
 	{
 		Uhrzeit = new GTITime(
 				raw.getJSONObject("time").optString("date"),
